@@ -918,10 +918,12 @@
 config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"</span>;
 <span class="code-keyword">using var</span> synth = <span class="code-keyword">new</span> <span class="code-type">SpeechSynthesizer</span>(config);
 <span class="code-keyword">var</span> result = <span class="code-keyword">await</span> synth.<span class="code-method">SpeakTextAsync</span>(text);`,
-      demoDesc: 'Enter text and hear it spoken by an Azure Neural TTS voice (en-US-JennyNeural).',
+      demoDesc: 'Upload an audio file to transcribe with Azure Speech Service.',
       demoInput: `<div class="input-group">
-        <div class="input-label">Text to Speak</div>
-        <input class="demo-input" type="text" id="speechText" value="Azure Speech Service converts text to natural-sounding speech using neural voices." />
+        <div class="input-label">Microphone / Audio Capture</div>
+        <div style="font-size:13.5px;color:var(--text-muted);font-style:italic;padding:10px 0;">
+          🎤 Live microphone capture coming soon — browser audio recording in progress.
+        </div>
       </div>`,
       runFn: 'runSpeechDemo'
     },
@@ -939,10 +941,10 @@ config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"<
 <span class="code-keyword">var</span> result = <span class="code-keyword">await</span> client.<span class="code-method">AnalyzeAsync</span>(
     <span class="code-type">ImageUrl</span>.AbsoluteUri(imageUrl),
     <span class="code-type">VisualFeatures</span>.Caption | <span class="code-type">VisualFeatures</span>.Tags);`,
-      demoDesc: 'Enter an image URL to analyze with Azure AI Vision.',
+      demoDesc: 'Upload an image to analyze with Azure AI Vision — caption, tags, and detected objects.',
       demoInput: `<div class="input-group">
-        <div class="input-label">Image URL</div>
-        <input class="demo-input" type="url" id="visionUrl" value="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/320px-Cat03.jpg" />
+        <div class="input-label">Image File</div>
+        <input class="demo-input" type="file" id="visionFile" accept="image/*" />
       </div>`,
       runFn: 'runVisionDemo'
     },
@@ -1175,44 +1177,22 @@ config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"<
   }
 
   async function runSpeechDemo() {
-    setLoading();
-    const text = document.getElementById('speechText')?.value?.trim();
-    if (!text) { setError('Please enter text to speak.'); return; }
-    try {
-      const res = await fetch(`${API_BASE}/api/Speech/synthesize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      const badge = document.getElementById('statusBadge');
-      badge.className = 'status-badge ready';
-      badge.textContent = '200 OK';
-      document.getElementById('responseBody').textContent =
-        JSON.stringify({ voiceName: data.voiceName, characterCount: data.characterCount, audioFormat: data.audioFormat }, null, 2);
-      document.getElementById('runBtn').disabled = false;
-
-      // Play audio
-      if (data.audioBase64) {
-        const audioEl = document.getElementById('audioEl');
-        audioEl.src = `data:audio/wav;base64,${data.audioBase64}`;
-        document.getElementById('audioPlayer').style.display = 'block';
-        audioEl.play();
-      }
-    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+    setError('🎤 Live microphone capture coming soon.');
   }
 
   async function runVisionDemo() {
     setLoading();
-    const imageUrl = document.getElementById('visionUrl')?.value?.trim();
-    if (!imageUrl) { setError('Please enter an image URL.'); return; }
+    const fileInput = document.getElementById('visionFile');
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      setError('Please select an image file to upload.');
+      return;
+    }
     try {
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
       const res = await fetch(`${API_BASE}/api/Vision/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl })
+        body: formData
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
