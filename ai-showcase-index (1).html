@@ -645,9 +645,6 @@
 
     <nav class="nav-section">
 
-      <div class="nav-category">Overview</div>
-      <div class="nav-item active" id="nav-home" onclick="loadService('home', this)"><span class="nav-dot"></span>Home</div>
-
       <div class="nav-category">Document Pipeline</div>
       <div class="nav-item" onclick="loadService('docIntelligence', this)"><span class="nav-dot"></span>Document Intelligence</div>
       <div class="nav-item" onclick="loadService('language', this)"><span class="nav-dot"></span>Language Service</div>
@@ -674,12 +671,13 @@
         <span></span><span></span><span></span>
       </div>
       <div class="breadcrumb">
-        <span class="breadcrumb-cat" id="bcCat">Overview</span>
+        <span class="breadcrumb-cat" id="bcCat">Interactive Media</span>
         <span class="breadcrumb-sep">›</span>
-        <span class="breadcrumb-current" id="bcCurrent">Home</span>
+        <span class="breadcrumb-current" id="bcCurrent">Azure OpenAI</span>
       </div>
       <div class="concept-tags" id="conceptTags">
-        <span class="tag">Overview</span>
+        <span class="tag">Interactive Media</span>
+        <span class="tag green">✓ Live API</span>
       </div>
     </div>
 
@@ -687,67 +685,63 @@
 
       <!-- SERVICE HEADER -->
       <div class="concept-header fade-in" id="concept-header">
-        <div class="concept-title" id="conceptTitle">Azure <span>AI Showcase</span></div>
-        <div class="concept-tagline" id="conceptTagline">Enterprise AI · .NET 8 · Azure PaaS</div>
+        <div class="concept-title" id="conceptTitle">Azure <span>OpenAI</span></div>
+        <div class="concept-tagline" id="conceptTagline">
+          GPT-4o-mini chat completions through Azure's enterprise endpoint. Same models as OpenAI, deployed in your Azure subscription with RBAC, private networking, and SLA.
+        </div>
         <div class="divider"></div>
       </div>
 
-      <!-- HOME PANEL (full width, shown by default) -->
-      <div class="panel fade-in" id="homePanel" style="grid-column: 1 / -1;">
-        <div class="panel-header">
-          <div class="panel-label">📋 &nbsp;What's Inside</div>
-        </div>
-        <div class="panel-body">
-          <div class="explanation-section">
-            <div class="section-label">What's Inside</div>
-            <div class="explanation-text" style="font-size:14.5px; color:#1a1a2e;">
-              <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:10px;">
-                <li>⚙️ &nbsp;<strong>.NET 8 Web API</strong> — one service class per AI primitive</li>
-                <li>🤖 &nbsp;<strong>7 Azure AI PaaS services</strong> across three capability groups</li>
-                <li>🌐 &nbsp;<strong>Vanilla JS SPA</strong> — GitHub Actions → Azure Static Web Apps</li>
-              </ul>
-            </div>
-          </div>
-          <div class="explanation-section">
-            <div class="section-label">Built with AI Collaboration</div>
-            <div class="explanation-text" style="font-size:14.5px; color:#1a1a2e;">
-              Architected and developed in partnership with Claude AI.
-            </div>
-          </div>
-          <div class="explanation-section">
-            <div class="explanation-text" style="color: var(--accent); font-weight: 600; font-size:14.5px;">
-              ← Select a service from the left to explore.
-            </div>
-          </div>
-          <div style="margin-top: 1.5rem;">
-            <div style="font-size: 13.5px; color: var(--text-secondary); font-style: italic;">
-              — Michael Bruno
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EXPLANATION PANEL (hidden until service selected) -->
-      <div class="panel fade-in" id="explanationPanel" style="display:none;">
+      <!-- EXPLANATION PANEL -->
+      <div class="panel fade-in" id="explanationPanel">
         <div class="panel-header">
           <div class="panel-label">📖 &nbsp;The Service</div>
           <div class="endpoint-badge" id="endpointBadge">
             <span class="method-badge">POST</span>/api/Chat/message
           </div>
         </div>
-        <div class="panel-body" id="explanationBody"></div>
+        <div class="panel-body" id="explanationBody">
+          <div class="explanation-section">
+            <div class="section-label">What it is</div>
+            <div class="explanation-text">
+              Azure OpenAI Service provides REST API access to OpenAI's language models including GPT-4o-mini, GPT-4, and embeddings. It adds enterprise controls — private endpoints, content filtering, usage quotas, and Azure AD authentication.
+            </div>
+          </div>
+          <div class="explanation-section">
+            <div class="section-label">In this codebase</div>
+            <div class="explanation-text">
+              AIShowcase.Api uses AzureOpenAIClient with a configured deployment name. The ChatService calls CompleteChatAsync with a system prompt and user message, returning the completion text and token usage.
+            </div>
+          </div>
+          <div class="explanation-section">
+            <div class="section-label">Code example</div>
+            <div class="code-snippet"><span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">AzureOpenAIClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> chat = client.<span class="code-method">GetChatClient</span>(<span class="code-string">"gpt-4o-mini"</span>);
+<span class="code-keyword">var</span> completion = <span class="code-keyword">await</span> chat.<span class="code-method">CompleteChatAsync</span>(
+    <span class="code-keyword">new</span> <span class="code-type">UserChatMessage</span>(userMessage));</div>
+          </div>
+        </div>
       </div>
 
-      <!-- DEMO PANEL (hidden until service selected) -->
-      <div class="panel fade-in" id="demoPanel" style="display:none;">
+      <!-- DEMO PANEL -->
+      <div class="panel fade-in" id="demoPanel">
         <div class="panel-header">
           <div class="panel-label">⚡ &nbsp;Live Demo</div>
         </div>
         <div class="panel-body">
           <div class="demo-controls">
-            <div class="demo-description" id="demoDescription"></div>
-            <div id="demoInputGroup"></div>
-            <button class="run-btn" onclick="runCurrentDemo()" id="runBtn">▶ &nbsp;Run Demo</button>
+            <div class="demo-description" id="demoDescription">
+              Send a message and get a response from GPT-4o-mini via Azure OpenAI.
+            </div>
+            <div id="demoInputGroup">
+              <div class="input-group">
+                <div class="input-label">Your Message</div>
+                <input class="demo-input" type="text" id="chatMessage" placeholder="Ask anything..." value="Explain Azure AI services in one sentence." />
+              </div>
+            </div>
+            <button class="run-btn" onclick="runCurrentDemo()" id="runBtn">
+              ▶ &nbsp;Run Demo
+            </button>
             <div class="response-area">
               <div class="response-header">
                 <span class="response-label">API Response</span>
@@ -757,7 +751,9 @@
                 <span class="response-placeholder">Tap "Run Demo" to fire the API call...</span>
               </div>
             </div>
-            <div class="audio-player" id="audioPlayer"><audio id="audioEl" controls></audio></div>
+            <div class="audio-player" id="audioPlayer">
+              <audio id="audioEl" controls></audio>
+            </div>
           </div>
         </div>
       </div>
@@ -801,22 +797,6 @@
 
   // ─── SERVICE DATA ────────────────────────────────────
   const services = {
-    home: {
-      category: 'Welcome',
-      breadcrumb: 'Overview',
-      titleMain: 'Azure',
-      titleAccent: 'AI Showcase',
-      tagline: 'Enterprise AI · .NET 8 · Azure PaaS',
-      tags: [{ label: 'Overview', green: false }],
-      endpoint: { method: 'GET', path: '/api/*' },
-      what: '',
-      codebase: '',
-      code: '',
-      demoDesc: '',
-      demoInput: '',
-      runFn: null,
-      isHome: true
-    },
     docIntelligence: {
       category: 'Document Pipeline',
       breadcrumb: 'Document Intelligence',
@@ -970,7 +950,7 @@ config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"<
   };
 
   // Track current service key
-  let currentServiceKey = 'home';
+  let currentServiceKey = 'openai';
 
   // ─── NAVIGATION ──────────────────────────────────────
   function toggleSidebar() {
@@ -1014,55 +994,41 @@ config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"<
     document.getElementById('conceptTitle').innerHTML = `${s.titleMain} <span>${s.titleAccent}</span>`;
     document.getElementById('conceptTagline').textContent = s.tagline;
 
-    // Home vs service panel
-    const homePanel = document.getElementById('homePanel');
-    const explanationPanel = document.getElementById('explanationPanel');
-    const demoPanel = document.getElementById('demoPanel');
+    // Endpoint badge
+    document.getElementById('endpointBadge').innerHTML =
+      `<span class="method-badge">${s.endpoint.method}</span>${s.endpoint.path}`;
 
-    if (s.isHome) {
-      homePanel.style.display = '';
-      explanationPanel.style.display = 'none';
-      demoPanel.style.display = 'none';
-    } else {
-      homePanel.style.display = 'none';
-      explanationPanel.style.display = '';
-      demoPanel.style.display = '';
+    // Explanation panel
+    document.getElementById('explanationBody').innerHTML = `
+      <div class="explanation-section">
+        <div class="section-label">What it is</div>
+        <div class="explanation-text">${s.what}</div>
+      </div>
+      <div class="explanation-section">
+        <div class="section-label">In this codebase</div>
+        <div class="explanation-text">${s.codebase}</div>
+      </div>
+      <div class="explanation-section">
+        <div class="section-label">Code example</div>
+        <div class="code-snippet">${s.code}</div>
+      </div>`;
 
-      // Endpoint badge
-      document.getElementById('endpointBadge').innerHTML =
-        `<span class="method-badge">${s.endpoint.method}</span>${s.endpoint.path}`;
+    // Demo panel
+    document.getElementById('demoDescription').textContent = s.demoDesc;
+    document.getElementById('demoInputGroup').outerHTML = `<div id="demoInputGroup">${s.demoInput}</div>`;
 
-      // Explanation panel
-      document.getElementById('explanationBody').innerHTML = `
-        <div class="explanation-section">
-          <div class="section-label">What it is</div>
-          <div class="explanation-text">${s.what}</div>
-        </div>
-        <div class="explanation-section">
-          <div class="section-label">In this codebase</div>
-          <div class="explanation-text">${s.codebase}</div>
-        </div>
-        <div class="explanation-section">
-          <div class="section-label">Code example</div>
-          <div class="code-snippet">${s.code}</div>
-        </div>`;
+    // Reset response + audio
+    document.getElementById('responseBody').innerHTML =
+      '<span class="response-placeholder">Tap "Run Demo" to fire the API call...</span>';
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'status-badge empty';
+    badge.textContent = 'Awaiting request';
 
-      // Demo panel
-      document.getElementById('demoDescription').textContent = s.demoDesc;
-      document.getElementById('demoInputGroup').outerHTML = `<div id="demoInputGroup">${s.demoInput}</div>`;
-
-      // Reset response + audio
-      document.getElementById('responseBody').innerHTML =
-        '<span class="response-placeholder">Tap "Run Demo" to fire the API call...</span>';
-      const badge = document.getElementById('statusBadge');
-      badge.className = 'status-badge empty';
-      badge.textContent = 'Awaiting request';
-      const audioPlayer = document.getElementById('audioPlayer');
-      if (audioPlayer) audioPlayer.style.display = 'none';
-    }
+    const audioPlayer = document.getElementById('audioPlayer');
+    if (audioPlayer) { audioPlayer.style.display = 'none'; }
 
     // Animate
-    ['concept-header', 'homePanel', 'explanationPanel', 'demoPanel'].forEach(id => {
+    ['concept-header', 'explanationPanel', 'demoPanel'].forEach(id => {
       const el = document.getElementById(id) || document.querySelector('.' + id);
       if (el) { el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
     });
