@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Enablement - Azure PaaS</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Epilogue:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #08080e;
+      --bg2:      #0d0d16;
+      --surface:  #11111c;
+      --surface2: #16162a;
+      --border:   #1c1c30;
+      --border2:  #252540;
+      --text:     #e8e8f4;
+      --muted:    #5a5a7a;
+      --muted2:   #8888aa;
+      --accent:   #7c6af7;
+      --accent2:  #a78bfa;
+      --c1:       #3b82f6;
+      --c2:       #06b6d4;
+      --c3:       #10b981;
+      --c4:       #f59e0b;
+      --c5:       #8b5cf6;
+      --c6:       #ec4899;
+      --c7:       #ef4444;
+      --clean:    #22c55e;
+      --sidebar-w: 240px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Epilogue', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════
+       APP SHELL
+    ═══════════════════════════ */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════
+       SIDEBAR
+    ═══════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 200;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .sidebar-brand {
+      padding: 1.75rem 1.25rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .brand-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .brand-title {
+      font-family: 'Epilogue', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+    }
+
+    .nav-group {
+      margin-bottom: 0.25rem;
+    }
+
+    .nav-group-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem 1.25rem 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-group-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: var(--muted2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .nav-item.active {
+      color: var(--accent2);
+      background: rgba(124,106,247,0.08);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nav-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .nav-item.active .nav-dot {
+      opacity: 1;
+      background: var(--accent2);
+    }
+
+    .nav-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .nav-chip.part1 { background: rgba(59,130,246,0.15); color: var(--c1); }
+    .nav-chip.part2 { background: rgba(245,158,11,0.15); color: var(--c4); }
+    .nav-chip.part3 { background: rgba(239,68,68,0.15);  color: var(--c7); }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-footer a:hover { color: var(--accent2); }
+
+    .sidebar-footer a:last-child { margin-bottom: 0; }
+
+    /* ═══════════════════════════
+       MOBILE TOPBAR
+    ═══════════════════════════ */
+    .mobile-topbar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      z-index: 150;
+      align-items: center;
+      padding: 0 1rem;
+      gap: 0.75rem;
+    }
+
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .hamburger:hover { background: rgba(255,255,255,0.06); }
+
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 1.5px;
+      background: var(--muted2);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .topbar-title {
+      font-family: 'Epilogue', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: rgba(124,106,247,0.12);
+      border: 1px solid rgba(124,106,247,0.25);
+      color: var(--accent2);
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════
+       OVERLAY
+    ═══════════════════════════ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 190;
+      backdrop-filter: blur(2px);
+    }
+
+    .overlay.visible { display: block; }
+
+    /* ═══════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════ */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 5rem 2rem 4rem;
+      max-width: 860px;
+      margin: 0 auto;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1px;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--c1) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted2);
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+    }
+
+    /* ── Section ── */
+    section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Part Cards ── */
+    .part-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .part-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .part-card::after {
+      content: '→';
+      position: absolute;
+      bottom: 1.5rem; right: 1.5rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .part-card:hover {
+      background: var(--surface2);
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .part-card:hover::after { color: var(--accent2); right: 1.25rem; }
+
+    .part-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .part-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .part-desc {
+      font-size: 0.82rem;
+      color: var(--muted2);
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+
+    .part-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+    }
+
+    /* ── API Section ── */
+    .api-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .api-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .api-routes-col { background: var(--bg2); }
+
+    .api-routes-col .api-routes {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .api-route {
+      background: var(--bg2);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .method-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      min-width: 42px;
+      text-align: center;
+    }
+
+    .method-post { background: rgba(34,197,94,0.15);  color: var(--clean); border: 1px solid rgba(34,197,94,0.25); }
+    .method-get  { background: rgba(59,130,246,0.15); color: var(--c1);    border: 1px solid rgba(59,130,246,0.25); }
+
+    .route-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted2);
+    }
+
+    .api-swagger-col {
+      background: var(--bg2);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .swagger-img-wrap {
+      overflow: hidden;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      cursor: zoom-in;
+      flex: 1;
+    }
+
+    .swagger-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 0% 8%;
+      display: block;
+      transition: opacity 0.15s;
+    }
+
+    .swagger-img-wrap:hover img { opacity: 0.85; }
+
+    .swagger-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+
+    .swagger-modal.open { display: flex; }
+
+    .swagger-modal img {
+      max-width: 760px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+
+    /* ── Stack ── */
+    .stack-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .stack-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .stack-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stack-item-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .stack-item-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    footer span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ═══════════════════════════
+       RESPONSIVE
+    ═══════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* Sidebar becomes drawer */
+      .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 4px 0 32px rgba(0,0,0,0.5);
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .sidebar-brand { padding-top: 1.25rem; }
+
+      /* Show mobile topbar */
+      .mobile-topbar { display: flex; }
+
+      /* Main content shifts for topbar */
+      .main-content {
+        margin-left: 0;
+        padding-top: 52px;
+      }
+
+      .hero {
+        padding: 2.5rem 1.25rem 2rem;
+      }
+
+      .hero h1 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+
+      section { padding: 1.75rem 1.25rem; }
+
+      .part-grid { grid-template-columns: 1fr; }
+
+      .api-two-col { grid-template-columns: 1fr; }
+
+      .api-swagger-col { display: none; } /* hide swagger image on mobile */
+
+      footer { padding: 1.25rem; }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-topbar { display: none; }
+      .overlay { display: none !important; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero-desc { font-size: 0.9rem; }
+      .part-card { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Overlay for mobile drawer -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app-shell">
+
+  <!-- ══════════════════════
+       SIDEBAR
+  ══════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-eyebrow">Michael Bruno · Azure</div>
+      <div class="brand-title"><em>Enterprise AI</em><br>in Azure</div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-group">
+        <div class="nav-group-label">Navigation</div>
+        <a href="index.html" class="nav-item active">
+          <span class="nav-dot"></span>
+          Overview
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">Capability Groups</div>
+
+        <a href="document-pipeline.html" class="nav-item">
+          <span class="nav-dot"></span>
+          Document Pipeline
+          <span class="nav-chip part1">P1</span>
+        </a>
+
+        <a href="interactive-media.html" class="nav-item">
+          <span class="nav-dot"></span>
+          Interactive Media
+          <span class="nav-chip part2">P2</span>
+        </a>
+
+        <a href="platform-safety.html" class="nav-item">
+          <span class="nav-dot"></span>
+          Platform &amp; Safety
+          <span class="nav-chip part3">P3</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">API Endpoints</div>
+        <a href="#api-section" class="nav-item" onclick="closeSidebar()">
+          <span class="nav-dot"></span>
+          Backend Routes
+        </a>
+        <a href="#stack-section" class="nav-item" onclick="closeSidebar()">
+          <span class="nav-dot"></span>
+          Tech Stack
+        </a>
+      </div>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="https://mbruno-projects.com" target="_blank">
+        ↗ mbruno-projects.com
+      </a>
+      <a href="https://github.com" target="_blank">
+        ↗ GitHub Repository
+      </a>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════
+       MOBILE TOPBAR
+  ══════════════════════ -->
+  <div class="mobile-topbar">
+    <div class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="topbar-title">Enterprise AI in Azure</div>
+    <div class="topbar-badge">Chapter 1</div>
+  </div>
+
+  <!-- ══════════════════════
+       MAIN CONTENT
+  ══════════════════════ -->
+  <main class="main-content">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-eyebrow">Michael Bruno · .NET 8 Web API · Azure East US</div>
+      <h1><em>Enterprise AI</em> in Azure</h1>
+      <p class="hero-desc">
+        Hands-on demonstration of consuming Azure AI PaaS services in a production-pattern
+        .NET 8 Web API.
+      </p>
+    </div>
+
+    <!-- Parts Nav -->
+    <section class="fade-up delay-2">
+      <div class="section-label">Select a Capability Group to Explore</div>
+      <div class="part-grid">
+
+        <a href="document-pipeline.html" class="part-card">
+          <div class="part-number">Part 1</div>
+          <div class="part-title">Document Pipeline</div>
+          <div class="part-desc">Upload a PDF and fan out across three primitives automatically — extraction, language understanding, and search indexing in a single flow.</div>
+          <div class="part-chips">
+            <span class="chip">Document Intelligence</span>
+            <span class="chip">Language</span>
+            <span class="chip">AI Search</span>
+          </div>
+        </a>
+
+        <a href="interactive-media.html" class="part-card">
+          <div class="part-number">Part 2</div>
+          <div class="part-title">Interactive Media</div>
+          <div class="part-desc">Generative and perceptual AI — chat completions, speech synthesis, and image analysis demonstrating Azure's multimodal surface area.</div>
+          <div class="part-chips">
+            <span class="chip">Azure OpenAI</span>
+            <span class="chip">Speech</span>
+            <span class="chip">Vision</span>
+          </div>
+        </a>
+
+        <a href="platform-safety.html" class="part-card">
+          <div class="part-number">Part 3</div>
+          <div class="part-title">Platform &amp; Safety</div>
+          <div class="part-desc">The production guardrail layer — real-time content moderation with per-category severity scoring. The primitive every enterprise AI deployment requires before going to users.</div>
+          <div class="part-chips">
+            <span class="chip">Content Safety</span>
+            <span class="chip">Moderation</span>
+            <span class="chip">Severity Scoring</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Backend API -->
+    <section class="fade-up delay-3" id="api-section">
+      <div class="section-label">Backend API — Not a Black Box</div>
+      <div class="api-section">
+        <div class="api-two-col">
+          <div class="api-routes-col">
+            <div class="api-routes">
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Document/analyze</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Language/analyze</span></div>
+              <div class="api-route"><span class="method-badge method-get">GET</span><span class="route-path">/api/Search/query</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Search/index</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Chat/message</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Speech/synthesize</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Vision/analyze</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-text</span></div>
+              <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-image</span></div>
+            </div>
+          </div>
+          <div class="api-swagger-col">
+            <div class="swagger-img-wrap" onclick="document.getElementById('swaggerModal').classList.add('open')" title="Click to expand">
+              <img
+                src="swagger-screenshot2.png"
+                alt="AIShowcase.Api Swagger UI"
+                onerror="this.parentElement.style.display='none';"
+              />
+            </div>
+          </div>
+          <div class="swagger-modal" id="swaggerModal" onclick="this.classList.remove('open')">
+            <img src="swagger-screenshot2.png" alt="AIShowcase.Api Swagger UI — full view" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="fade-up delay-4" id="stack-section">
+      <div class="section-label">Technical Stack</div>
+      <div class="stack-row">
+        <div class="stack-item">
+          <div class="stack-dot" style="background:var(--c1)"></div>
+          <div>
+            <div class="stack-item-name">.NET 8 / C#</div>
+            <div class="stack-item-sub">Web API · Minimal Hosting</div>
+          </div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-dot" style="background:var(--c4)"></div>
+          <div>
+            <div class="stack-item-name">Azure PaaS</div>
+            <div class="stack-item-sub">East US · rg-ai-showcase</div>
+          </div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-dot" style="background:var(--c2)"></div>
+          <div>
+            <div class="stack-item-name">Azure SDK for .NET</div>
+            <div class="stack-item-sub">Azure.AI.* NuGet packages</div>
+          </div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-dot" style="background:var(--c3)"></div>
+          <div>
+            <div class="stack-item-name">Swashbuckle</div>
+            <div class="stack-item-sub">Swagger / OpenAPI 3.0</div>
+          </div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-dot" style="background:var(--c6)"></div>
+          <div>
+            <div class="stack-item-name">Vanilla HTML/CSS/JS</div>
+            <div class="stack-item-sub">No framework · No build step</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <span>Michael Bruno · Senior .NET / Azure Architect</span>
+      <span>Azure AI Showcase · Chapter 1 · 2026</span>
+    </footer>
+
+  </main><!-- /main-content -->
+
+</div><!-- /app-shell -->
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('visible');
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('visible');
+  }
+
+  // Close sidebar on ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSidebar();
+  });
+
+  // Smooth scroll for anchor links on mobile
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,672 +1,1197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Enablement - Azure PaaS</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Epilogue:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:       #08080e;
-      --bg2:      #0d0d16;
-      --surface:  #11111c;
-      --surface2: #16162a;
-      --border:   #1c1c30;
-      --border2:  #252540;
-      --text:     #e8e8f4;
-      --muted:    #5a5a7a;
-      --muted2:   #8888aa;
-      --accent:   #7c6af7;
-      --accent2:  #a78bfa;
-      --c1:       #3b82f6;  /* doc intel — blue */
-      --c2:       #06b6d4;  /* language — cyan */
-      --c3:       #10b981;  /* search — green */
-      --c4:       #f59e0b;  /* openai — amber */
-      --c5:       #8b5cf6;  /* speech — purple */
-      --c6:       #ec4899;  /* vision — pink */
-      --c7:       #ef4444;  /* content safety — red */
-      --clean:    #22c55e;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure AI Showcase · Michael Bruno</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --bg-white: #FFFFFF;
+    --sidebar-bg: #1C2B3A;
+    --sidebar-text: #A8BDD0;
+    --sidebar-active: #FFFFFF;
+    --sidebar-category: #4A90A4;
+    --accent: #2D7D9A;
+    --accent-light: #E8F4F8;
+    --accent-hover: #1F5F77;
+    --text-primary: #1A1A2E;
+    --text-secondary: #5A6677;
+    --text-muted: #8A96A3;
+    --border: #E2DDD5;
+    --border-light: #EDE9E2;
+    --tag-bg: #EEF7FA;
+    --tag-text: #2D7D9A;
+    --success: #2D9A6B;
+    --success-bg: #E8F7F2;
+    --code-bg: #F0EDE8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --sidebar-width: 260px;
+    --topbar-height: 52px;
+    --mobile-topbar: 56px;
+    --mobile-nav-height: 60px;
+  }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Epilogue', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    overflow: hidden;
+  }
 
-    /* ── Hero ── */
-    .hero {
-      padding: 5rem 2rem 4rem;
-      max-width: 1100px;
-      margin: 0 auto;
-      opacity: 0;
-      animation: fadeUp 0.7s ease forwards;
-    }
-    .hero-eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--accent);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .hero-eyebrow::before {
-      content: '';
-      display: inline-block;
-      width: 24px; height: 1px;
-      background: var(--accent);
-    }
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-    }
-    .hero h1 em {
-      font-style: normal;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--c1) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-desc {
-      font-size: 1.1rem;
-      color: var(--muted2);
-      /* max-width: 640px; */
-      line-height: 1.75;
-      font-weight: 300;
-      margin-bottom: 2.5rem;
-    }
-    .hero-meta {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .meta-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      padding: 0.35rem 0.85rem;
-      border-radius: 20px;
-      border: 1px solid var(--border2);
-      color: var(--muted2);
-      letter-spacing: 0.05em;
-    }
-    .meta-pill.accent {
-      border-color: rgba(124,106,247,0.4);
-      color: var(--accent2);
-      background: rgba(124,106,247,0.08);
-    }
+  /* ═══════════════════════════════
+     DESKTOP LAYOUT
+  ═══════════════════════════════ */
+  .app { display: flex; height: 100vh; }
 
-    /* ── Section ── */
-    section {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 3rem 2rem;
-    }
-    .section-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    /* ── Part Cards ── */
-    .part-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1rem;
-    }
-    .part-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.75rem;
-      text-decoration: none;
-      display: block;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .part-card::after {
-      content: '→';
-      position: absolute;
-      bottom: 1.5rem; right: 1.5rem;
-      font-size: 1.1rem;
-      color: var(--muted);
-      transition: all 0.2s;
-    }
-    .part-card:hover {
-      background: var(--surface2);
-      border-color: var(--border2);
-      transform: translateY(-2px);
-    }
-    .part-card:hover::after {
-      color: var(--accent2);
-      right: 1.25rem;
-    }
-    .part-number {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 0.6rem;
-    }
-    .part-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-    .part-desc {
-      font-size: 0.83rem;
-      color: var(--muted2);
-      line-height: 1.65;
-      margin-bottom: 1rem;
-    }
-    .part-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-    .chip {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
-      border: 1px solid var(--border2);
-      color: var(--muted2);
-    }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 100;
+    transition: transform 0.3s ease;
+  }
 
-    /* ── Backend API Section ── */
-    .api-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .api-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .api-header-left h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-    .api-header-left p {
-      font-size: 0.82rem;
-      color: var(--muted2);
-    }
-    .api-endpoint {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--accent2);
-      background: rgba(124,106,247,0.08);
-      border: 1px solid rgba(124,106,247,0.2);
-      padding: 0.35rem 0.85rem;
-      border-radius: 5px;
-    }
-    .api-routes {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1px;
-      background: var(--border);
-    }
-    .api-route {
-      background: var(--bg2);
-      padding: 0.85rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .method-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem;
-      font-weight: 700;
-      padding: 0.15rem 0.45rem;
-      border-radius: 3px;
-      min-width: 42px;
-      text-align: center;
-    }
-    .method-post { background: rgba(34,197,94,0.15); color: var(--clean); border: 1px solid rgba(34,197,94,0.25); }
-    .method-get  { background: rgba(59,130,246,0.15); color: var(--c1);    border: 1px solid rgba(59,130,246,0.25); }
-    .route-path {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--muted2);
-    }
+  .sidebar-header {
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
 
-    /* ── Stack Section ── */
-    .stack-row {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .stack-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .stack-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .stack-item-name {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .stack-item-sub {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 0.1rem;
-    }
+  .sidebar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #FFFFFF;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+  }
 
-    /* ── Chapter 2 Teaser ── */
-    .chapter2 {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .chapter2-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-    .chapter2 h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    .chapter2 p {
-      font-size: 0.85rem;
-      color: var(--muted2);
-      line-height: 1.7;
-    }
-    .chapter2-tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    .coming-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      border: 1px dashed var(--border2);
-      color: var(--muted);
-    }
+  .sidebar-logo span { color: var(--sidebar-category); }
 
-    /* ── Footer ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    footer span {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--muted);
-    }
+  .sidebar-subtitle {
+    font-size: 10.5px;
+    color: var(--sidebar-text);
+    margin-top: 5px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
 
-    /* ── Animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up {
-      opacity: 0;
-      animation: fadeUp 0.6s ease forwards;
-    }
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
-    .delay-5 { animation-delay: 0.5s; }
-      section { padding: 2rem 1rem; }
-      .hero { padding: 3rem 1rem 0rem; }
-    
+  .nav-section { padding: 16px 0 8px; }
 
-    /* ── API Two-Column ── */
-    .api-two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-    }
-    .api-routes-col {
-      background: var(--bg2);
-    }
-    .api-routes-col .api-routes {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-    }
-    .api-swagger-col {
-      background: var(--bg2);
-      padding: 0.75rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .swagger-img-wrap {
-      overflow: hidden;
-      border-radius: 6px;
-      border: 1px solid var(--border2);
-      cursor: zoom-in;
-      flex: 1;
-    }
-    .swagger-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 0% 8%;
-      display: block;
-      transition: opacity 0.15s;
-    }
-    .swagger-img-wrap:hover img { opacity: 0.85; }
-    /* Modal */
-    .swagger-modal {
-      display: none;
+  .nav-category {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--sidebar-category);
+    padding: 0 20px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-category::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(74,144,164,0.25);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13.5px;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-left: 3px solid transparent;
+    font-weight: 400;
+    user-select: none;
+  }
+
+  .nav-item:hover { color: #FFFFFF; background: rgba(255,255,255,0.05); }
+
+  .nav-item.active {
+    color: var(--sidebar-active);
+    background: rgba(45,125,154,0.2);
+    border-left-color: var(--sidebar-category);
+    font-weight: 500;
+  }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+
+  .nav-item.active .nav-dot { opacity: 1; background: var(--sidebar-category); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 10.5px;
+    color: rgba(168,189,208,0.35);
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .topbar {
+    height: var(--topbar-height);
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  .hamburger:hover { background: var(--bg); }
+  .hamburger span {
+    display: block;
+    width: 20px; height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    min-width: 0;
+  }
+
+  .breadcrumb-cat { white-space: nowrap; }
+  .breadcrumb-sep { opacity: 0.4; }
+  .breadcrumb-current { color: var(--accent); font-weight: 600; white-space: nowrap; }
+
+  .concept-tags { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    white-space: nowrap;
+  }
+
+  .tag.green { background: var(--success-bg); color: var(--success); }
+
+  /* ── CONTENT AREA ── */
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 22px;
+    align-content: start;
+  }
+
+  .concept-header { grid-column: 1 / -1; }
+
+  .concept-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  .concept-title span { color: var(--accent); }
+
+  .concept-tagline {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-weight: 300;
+    line-height: 1.65;
+    max-width: 680px;
+  }
+
+  .divider {
+    width: 44px; height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-top: 16px;
+    opacity: 0.6;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--bg-white);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 10px;
+  }
+
+  .panel-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  .panel-body { padding: 18px; flex: 1; }
+
+  .explanation-section { margin-bottom: 16px; }
+  .explanation-section:last-child { margin-bottom: 0; }
+
+  .section-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 7px;
+  }
+
+  .explanation-text {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  .code-snippet {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 13px 15px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.65;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .code-comment { color: #8A96A3; }
+  .code-keyword { color: #2D7D9A; font-weight: 500; }
+  .code-type { color: #7C3AED; }
+  .code-string { color: #2D9A6B; }
+  .code-method { color: #B45309; }
+
+  /* DEMO PANEL */
+  .demo-controls { display: flex; flex-direction: column; gap: 14px; }
+
+  .demo-description {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .input-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .demo-select, .demo-input {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    -webkit-appearance: none;
+    resize: vertical;
+  }
+
+  .demo-select:focus, .demo-input:focus {
+    border-color: var(--accent);
+    background: var(--bg-white);
+  }
+
+  .run-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.2px;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .run-btn:hover { background: var(--accent-hover); }
+  .run-btn:active { transform: scale(0.98); }
+  .run-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+  .endpoint-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--accent-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .method-badge {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: var(--accent);
+    color: white;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .response-area {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .response-header {
+    padding: 8px 13px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--code-bg);
+  }
+
+  .response-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .status-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.4px;
+  }
+
+  .status-badge.ready { background: var(--success-bg); color: var(--success); }
+  .status-badge.waiting { background: #FEF3C7; color: #92400E; }
+  .status-badge.empty { background: var(--border-light); color: var(--text-muted); }
+  .status-badge.error { background: #FEE2E2; color: #991B1B; }
+
+  .response-body {
+    padding: 13px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    min-height: 90px;
+    word-break: break-all;
+    -webkit-overflow-scrolling: touch;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .response-placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* Audio player */
+  .audio-player {
+    display: none;
+    margin-top: 8px;
+  }
+  .audio-player audio { width: 100%; border-radius: 6px; }
+
+  /* OVERLAY */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+  }
+  .overlay.visible { display: block; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ANIMATIONS */
+  .fade-in { animation: fadeIn 0.28s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .pulse { animation: pulse 1.4s ease infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  /* ═══════════════════════════════
+     MOBILE RESPONSIVE
+  ═══════════════════════════════ */
+
+  @media (max-width: 768px) {
+    body { overflow: hidden; }
+    .app { flex-direction: column; height: 100dvh; }
+
+    .sidebar {
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 1000;
+      top: 0; left: 0;
+      height: 100%;
+      width: 280px;
+      transform: translateX(-100%);
+      z-index: 200;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+    }
+
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-header { padding: 52px 20px 18px; }
+
+    .topbar { height: var(--mobile-topbar); padding: 0 16px; gap: 10px; }
+    .hamburger { display: flex; }
+
+    .breadcrumb { font-size: 11px; flex: 1; min-width: 0; overflow: hidden; }
+    .breadcrumb-cat { display: none; }
+    .breadcrumb-sep { display: none; }
+    .breadcrumb-current { font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+
+    .concept-tags .tag:first-child { display: none; }
+
+    .content-area {
+      grid-template-columns: 1fr;
+      padding: 20px 16px;
+      padding-bottom: calc(20px + var(--mobile-nav-height));
+      gap: 16px;
+    }
+
+    .concept-header { grid-column: 1; }
+    .concept-title { font-size: 24px; }
+    .concept-tagline { font-size: 13.5px; margin-top: 7px; }
+    .divider { margin-top: 14px; }
+
+    .panel { border-radius: 10px; }
+    .panel-header { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+    .panel-body { padding: 14px; }
+
+    .code-snippet { font-size: 11px; padding: 11px 13px; }
+    .explanation-text { font-size: 13px; }
+    .run-btn { min-height: 48px; font-size: 15px; }
+
+    .demo-select, .demo-input { font-size: 16px; padding: 11px 12px; }
+
+    /* Bottom nav bar */
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--mobile-nav-height);
+      background: var(--sidebar-bg);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      z-index: 150;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .mobile-nav::-webkit-scrollbar { display: none; }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
-      cursor: zoom-out;
+      padding: 8px 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+      gap: 4px;
+      min-width: 70px;
+      transition: background 0.15s;
     }
-    .swagger-modal.open { display: flex; }
-    .swagger-modal img {
-      max-width: 760px;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--border2);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+
+    .mobile-nav-item:active { background: rgba(255,255,255,0.07); }
+    .mobile-nav-item.active { background: rgba(45,125,154,0.25); }
+    .mobile-nav-icon { font-size: 16px; }
+
+    .mobile-nav-label {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--sidebar-text);
+      letter-spacing: 0.3px;
+      text-align: center;
+      white-space: nowrap;
     }
-    @media (max-width: 640px) {
-      .api-two-col { grid-template-columns: 1fr; }
+
+    .mobile-nav-item.active .mobile-nav-label { color: #FFFFFF; }
+
+    .mobile-nav-divider {
+      width: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 10px 0;
+      flex-shrink: 0;
     }
-  </style>
+  }
+
+  @media (min-width: 769px) {
+    .mobile-nav { display: none; }
+    .overlay { display: none !important; }
+  }
+
+  @media (min-width: 1200px) {
+    .content-area { padding: 36px 36px; gap: 26px; }
+    .topbar { padding: 0 36px; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-eyebrow">Michael Bruno · .NET 8 Web API · Azure East US</div>
-    <!-- <h1><em>Enterprise AI</em><br/>in Azure</h1> -->
-      <h1><em>Enterprise AI</em> in Azure</h1>
-    <p class="hero-desc">
-      Hands-on demonstration of consuming Azure AI PaaS services in a production-pattern
-      .NET 8 Web API.
-    </p>
-<!--     <div class="hero-meta">
-      <span class="meta-pill accent">7 Azure AI Services</span>
-      <span class="meta-pill accent">12 Primitives</span>
-      <span class="meta-pill">.NET 8 · C#</span> -->
-      <!-- <span class="meta-pill">Azure East US</span>
-      <span class="meta-pill">rg-ai-showcase</span> -->
-    <!-- </div> -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Azure <span>AI</span><br>Showcase</div>
+      <div class="sidebar-subtitle">Enterprise AI · .NET 8 · Azure PaaS</div>
+    </div>
+
+    <nav class="nav-section">
+
+      <div class="nav-category">Document Pipeline</div>
+      <div class="nav-item" onclick="loadService('docIntelligence', this)"><span class="nav-dot"></span>Document Intelligence</div>
+      <div class="nav-item" onclick="loadService('language', this)"><span class="nav-dot"></span>Language Service</div>
+      <div class="nav-item" onclick="loadService('search', this)"><span class="nav-dot"></span>AI Search</div>
+
+      <div class="nav-category">Interactive Media</div>
+      <div class="nav-item active" id="nav-openai" onclick="loadService('openai', this)"><span class="nav-dot"></span>Azure OpenAI</div>
+      <div class="nav-item" onclick="loadService('speech', this)"><span class="nav-dot"></span>Speech Service</div>
+      <div class="nav-item" onclick="loadService('vision', this)"><span class="nav-dot"></span>AI Vision</div>
+
+      <div class="nav-category">Platform &amp; Safety</div>
+      <div class="nav-item" onclick="loadService('contentSafety', this)"><span class="nav-dot"></span>Content Safety</div>
+
+    </nav>
+
+    <div class="sidebar-footer">mbruno-projects.com · 2026</div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="breadcrumb">
+        <span class="breadcrumb-cat" id="bcCat">Interactive Media</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current" id="bcCurrent">Azure OpenAI</span>
+      </div>
+      <div class="concept-tags" id="conceptTags">
+        <span class="tag">Interactive Media</span>
+        <span class="tag green">✓ Live API</span>
+      </div>
+    </div>
+
+    <div class="content-area" id="contentArea">
+
+      <!-- SERVICE HEADER -->
+      <div class="concept-header fade-in" id="concept-header">
+        <div class="concept-title" id="conceptTitle">Azure <span>OpenAI</span></div>
+        <div class="concept-tagline" id="conceptTagline">
+          GPT-4o-mini chat completions through Azure's enterprise endpoint. Same models as OpenAI, deployed in your Azure subscription with RBAC, private networking, and SLA.
+        </div>
+        <div class="divider"></div>
+      </div>
+
+      <!-- EXPLANATION PANEL -->
+      <div class="panel fade-in" id="explanationPanel">
+        <div class="panel-header">
+          <div class="panel-label">📖 &nbsp;The Service</div>
+          <div class="endpoint-badge" id="endpointBadge">
+            <span class="method-badge">POST</span>/api/Chat/message
+          </div>
+        </div>
+        <div class="panel-body" id="explanationBody">
+          <div class="explanation-section">
+            <div class="section-label">What it is</div>
+            <div class="explanation-text">
+              Azure OpenAI Service provides REST API access to OpenAI's language models including GPT-4o-mini, GPT-4, and embeddings. It adds enterprise controls — private endpoints, content filtering, usage quotas, and Azure AD authentication.
+            </div>
+          </div>
+          <div class="explanation-section">
+            <div class="section-label">In this codebase</div>
+            <div class="explanation-text">
+              AIShowcase.Api uses AzureOpenAIClient with a configured deployment name. The ChatService calls CompleteChatAsync with a system prompt and user message, returning the completion text and token usage.
+            </div>
+          </div>
+          <div class="explanation-section">
+            <div class="section-label">Code example</div>
+            <div class="code-snippet"><span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">AzureOpenAIClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> chat = client.<span class="code-method">GetChatClient</span>(<span class="code-string">"gpt-4o-mini"</span>);
+<span class="code-keyword">var</span> completion = <span class="code-keyword">await</span> chat.<span class="code-method">CompleteChatAsync</span>(
+    <span class="code-keyword">new</span> <span class="code-type">UserChatMessage</span>(userMessage));</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEMO PANEL -->
+      <div class="panel fade-in" id="demoPanel">
+        <div class="panel-header">
+          <div class="panel-label">⚡ &nbsp;Live Demo</div>
+        </div>
+        <div class="panel-body">
+          <div class="demo-controls">
+            <div class="demo-description" id="demoDescription">
+              Send a message and get a response from GPT-4o-mini via Azure OpenAI.
+            </div>
+            <div id="demoInputGroup">
+              <div class="input-group">
+                <div class="input-label">Your Message</div>
+                <input class="demo-input" type="text" id="chatMessage" placeholder="Ask anything..." value="Explain Azure AI services in one sentence." />
+              </div>
+            </div>
+            <button class="run-btn" onclick="runCurrentDemo()" id="runBtn">
+              ▶ &nbsp;Run Demo
+            </button>
+            <div class="response-area">
+              <div class="response-header">
+                <span class="response-label">API Response</span>
+                <span class="status-badge empty" id="statusBadge">Awaiting request</span>
+              </div>
+              <div class="response-body" id="responseBody">
+                <span class="response-placeholder">Tap "Run Demo" to fire the API call...</span>
+              </div>
+            </div>
+            <div class="audio-player" id="audioPlayer">
+              <audio id="audioEl" controls></audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-item" onclick="loadService('docIntelligence', null, this)">
+    <span class="mobile-nav-icon">📄</span>
+    <span class="mobile-nav-label">Doc Intel</span>
   </div>
-  <!-- Parts Nav -->
-  <section class="fade-up delay-2">
-    <div class="section-label">Select a Capability Group to Explore</div>
-    <div class="part-grid">
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-item active" onclick="loadService('openai', null, this)">
+    <span class="mobile-nav-icon">🤖</span>
+    <span class="mobile-nav-label">OpenAI</span>
+  </div>
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-item" onclick="loadService('speech', null, this)">
+    <span class="mobile-nav-icon">🔊</span>
+    <span class="mobile-nav-label">Speech</span>
+  </div>
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-item" onclick="loadService('vision', null, this)">
+    <span class="mobile-nav-icon">👁️</span>
+    <span class="mobile-nav-label">Vision</span>
+  </div>
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-item" onclick="loadService('contentSafety', null, this)">
+    <span class="mobile-nav-icon">🛡️</span>
+    <span class="mobile-nav-label">Safety</span>
+  </div>
+</nav>
 
-      <a href="document-pipeline.html" class="part-card">
-        <div class="part-number">Part 1</div>
-        <div class="part-title">Document Pipeline</div>
-        <div class="part-desc">Upload a PDF and fan out across three primitives automatically — extraction, language understanding, and search indexing in a single flow.</div>
-        <div class="part-chips">
-          <span class="chip">Document Intelligence</span>
-          <span class="chip">Language</span>
-          <span class="chip">AI Search</span>
-        </div>
-      </a>
+<script>
+  // ─── CONFIG ─────────────────────────────────────────
+  // !! UPDATE THIS to your deployed AI Showcase API base URL !!
+  const API_BASE = 'https://aishowcase-api-6lzz2tc7kf3gw.azurewebsites.net';
 
-      <a href="interactive-media.html" class="part-card">
-        <div class="part-number">Part 2</div>
-        <div class="part-title">Interactive Media</div>
-        <div class="part-desc">Generative and perceptual AI — chat completions, speech synthesis, and image analysis demonstrating Azure's multimodal surface area.</div>
-        <div class="part-chips">
-          <span class="chip">Azure OpenAI</span>
-          <span class="chip">Speech</span>
-          <span class="chip">Vision</span>
-        </div>
-      </a>
+  // ─── SERVICE DATA ────────────────────────────────────
+  const services = {
+    docIntelligence: {
+      category: 'Document Pipeline',
+      breadcrumb: 'Document Intelligence',
+      titleMain: 'Document',
+      titleAccent: 'Intelligence',
+      tagline: 'Extract structured data from PDFs and images. Azure Document Intelligence uses trained models to pull fields, tables, and key-value pairs from unstructured documents.',
+      tags: [{ label: 'Document Pipeline', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/Document/analyze' },
+      what: 'Azure Document Intelligence (formerly Form Recognizer) applies pre-built and custom ML models to extract structured content from documents. It handles PDFs, images, and scanned forms — returning fields, confidence scores, and bounding boxes.',
+      codebase: 'AIShowcase.Api uses DocumentAnalysisClient with the prebuilt-read model. The service posts the document stream and awaits AnalyzeDocumentAsync, then maps the result to a clean DTO.',
+      code: `<span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">DocumentAnalysisClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> operation = <span class="code-keyword">await</span> client
+    .<span class="code-method">AnalyzeDocumentAsync</span>(<span class="code-type">WaitUntil</span>.Completed,
+        <span class="code-string">"prebuilt-read"</span>, documentStream);
+<span class="code-keyword">var</span> result = operation.Value;`,
+      demoDesc: 'Enter a publicly accessible PDF URL to analyze with Azure Document Intelligence.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">PDF URL</div>
+        <input class="demo-input" type="url" id="docUrl" value="https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/sample-layout.pdf" />
+      </div>`,
+      runFn: 'runDocIntelligenceDemo'
+    },
+    language: {
+      category: 'Document Pipeline',
+      breadcrumb: 'Language Service',
+      titleMain: 'Language',
+      titleAccent: 'Service',
+      tagline: 'Extract meaning from text. Sentiment analysis, key phrase extraction, entity recognition, and language detection — all from a single Azure AI Language endpoint.',
+      tags: [{ label: 'Document Pipeline', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/Language/analyze' },
+      what: 'Azure AI Language consolidates NLP primitives under one service. It detects sentiment with confidence scores, extracts key phrases, recognizes named entities (people, places, dates), and identifies the language of any text.',
+      codebase: 'AIShowcase.Api uses TextAnalyticsClient. The LanguageService calls AnalyzeSentimentAsync, ExtractKeyPhrasesAsync, and RecognizeEntitiesAsync — combining results into a single clean response object.',
+      code: `<span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">TextAnalyticsClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> sentiment  = <span class="code-keyword">await</span> client.<span class="code-method">AnalyzeSentimentAsync</span>(text);
+<span class="code-keyword">var</span> keyPhrases = <span class="code-keyword">await</span> client.<span class="code-method">ExtractKeyPhrasesAsync</span>(text);
+<span class="code-keyword">var</span> entities   = <span class="code-keyword">await</span> client.<span class="code-method">RecognizeEntitiesAsync</span>(text);`,
+      demoDesc: 'Enter any text to analyze for sentiment, key phrases, and named entities.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Text to Analyze</div>
+        <textarea class="demo-input" id="langText" rows="3">Azure AI Language Service is an amazing tool for natural language processing. Microsoft has done a great job with the SDK.</textarea>
+      </div>`,
+      runFn: 'runLanguageDemo'
+    },
+    search: {
+      category: 'Document Pipeline',
+      breadcrumb: 'AI Search',
+      titleMain: 'AI',
+      titleAccent: 'Search',
+      tagline: 'Enterprise search with semantic understanding. Azure AI Search indexes documents and returns results ranked by relevance — not just keyword matches.',
+      tags: [{ label: 'Document Pipeline', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'GET', path: '/api/Search/query' },
+      what: 'Azure AI Search combines full-text search with vector similarity and semantic ranking. It indexes any structured or unstructured content and returns results with highlights, scores, and AI-enriched fields.',
+      codebase: 'AIShowcase.Api uses SearchClient. The SearchService builds a SearchOptions object with select fields and filter expressions, then maps results to a clean list DTO.',
+      code: `<span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">SearchClient</span>(endpoint, indexName, credential);
+<span class="code-keyword">var</span> options = <span class="code-keyword">new</span> <span class="code-type">SearchOptions</span> {
+    Size = <span class="code-string">5</span>, IncludeTotalCount = <span class="code-keyword">true</span>
+};
+<span class="code-keyword">var</span> results = <span class="code-keyword">await</span> client
+    .<span class="code-method">SearchAsync</span>&lt;<span class="code-type">SearchDocument</span>&gt;(query, options);`,
+      demoDesc: 'Query the AI Search index and see ranked results from the indexed document collection.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Search Query</div>
+        <input class="demo-input" type="text" id="searchQuery" value="Azure AI services" />
+      </div>`,
+      runFn: 'runSearchDemo'
+    },
+    openai: {
+      category: 'Interactive Media',
+      breadcrumb: 'Azure OpenAI',
+      titleMain: 'Azure',
+      titleAccent: 'OpenAI',
+      tagline: "GPT-4o-mini chat completions through Azure's enterprise endpoint. Same models as OpenAI, deployed in your Azure subscription with RBAC, private networking, and SLA.",
+      tags: [{ label: 'Interactive Media', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/Chat/message' },
+      what: "Azure OpenAI Service provides REST API access to OpenAI's language models including GPT-4o-mini and GPT-4. It adds enterprise controls — private endpoints, content filtering, usage quotas, and Azure AD authentication.",
+      codebase: 'AIShowcase.Api uses AzureOpenAIClient with a configured deployment name. The ChatService calls CompleteChatAsync with a system prompt and user message, returning the completion text and token usage.',
+      code: `<span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">AzureOpenAIClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> chat = client.<span class="code-method">GetChatClient</span>(<span class="code-string">"gpt-4o-mini"</span>);
+<span class="code-keyword">var</span> completion = <span class="code-keyword">await</span> chat.<span class="code-method">CompleteChatAsync</span>(
+    <span class="code-keyword">new</span> <span class="code-type">UserChatMessage</span>(userMessage));`,
+      demoDesc: 'Send a message and get a response from GPT-4o-mini via Azure OpenAI.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Your Message</div>
+        <input class="demo-input" type="text" id="chatMessage" value="Explain Azure AI services in one sentence." />
+      </div>`,
+      runFn: 'runOpenAIDemo'
+    },
+    speech: {
+      category: 'Interactive Media',
+      breadcrumb: 'Speech Service',
+      titleMain: 'Speech',
+      titleAccent: 'Service',
+      tagline: 'Convert text to natural-sounding speech. Azure Speech Service offers neural voices in dozens of languages — streaming audio directly to the browser.',
+      tags: [{ label: 'Interactive Media', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/Speech/synthesize' },
+      what: 'Azure AI Speech provides text-to-speech (TTS), speech-to-text (STT), and real-time translation. Neural TTS voices sound natural and expressive — configurable for pitch, rate, and style using SSML.',
+      codebase: 'AIShowcase.Api uses SpeechSynthesizer configured with an AudioOutputStream. The SpeechService synthesizes the text, returns audio bytes as base64, and the frontend decodes and plays it via the Web Audio API.',
+      code: `<span class="code-keyword">var</span> config = <span class="code-type">SpeechConfig</span>.<span class="code-method">FromSubscription</span>(key, region);
+config.SpeechSynthesisVoiceName = <span class="code-string">"en-US-JennyNeural"</span>;
+<span class="code-keyword">using var</span> synth = <span class="code-keyword">new</span> <span class="code-type">SpeechSynthesizer</span>(config);
+<span class="code-keyword">var</span> result = <span class="code-keyword">await</span> synth.<span class="code-method">SpeakTextAsync</span>(text);`,
+      demoDesc: 'Enter text and hear it spoken by an Azure Neural TTS voice (en-US-JennyNeural).',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Text to Speak</div>
+        <input class="demo-input" type="text" id="speechText" value="Azure Speech Service converts text to natural-sounding speech using neural voices." />
+      </div>`,
+      runFn: 'runSpeechDemo'
+    },
+    vision: {
+      category: 'Interactive Media',
+      breadcrumb: 'AI Vision',
+      titleMain: 'AI',
+      titleAccent: 'Vision',
+      tagline: 'Understand images with AI. Azure AI Vision generates captions, detects objects, reads text, and identifies visual features — all from a single API call.',
+      tags: [{ label: 'Interactive Media', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/Vision/analyze' },
+      what: 'Azure AI Vision applies pre-trained models to images for captioning, object detection, OCR, and content tagging. The v4.0 API adds dense captions and background removal capabilities.',
+      codebase: 'AIShowcase.Api uses ImageAnalysisClient with VisualFeatures flags. The VisionService calls AnalyzeAsync with the image URL and returns captions, tags, objects, and any detected text.',
+      code: `<span class="code-keyword">var</span> client = <span class="code-keyword">new</span> <span class="code-type">ImageAnalysisClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> result = <span class="code-keyword">await</span> client.<span class="code-method">AnalyzeAsync</span>(
+    <span class="code-type">ImageUrl</span>.AbsoluteUri(imageUrl),
+    <span class="code-type">VisualFeatures</span>.Caption | <span class="code-type">VisualFeatures</span>.Tags);`,
+      demoDesc: 'Enter an image URL to analyze with Azure AI Vision.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Image URL</div>
+        <input class="demo-input" type="url" id="visionUrl" value="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/320px-Cat03.jpg" />
+      </div>`,
+      runFn: 'runVisionDemo'
+    },
+    contentSafety: {
+      category: 'Platform & Safety',
+      breadcrumb: 'Content Safety',
+      titleMain: 'Content',
+      titleAccent: 'Safety',
+      tagline: 'The guardrail every production AI deployment needs. Azure Content Safety scores text across hate, violence, sexual, and self-harm categories with per-category severity.',
+      tags: [{ label: 'Platform & Safety', green: false }, { label: '✓ Live API', green: true }],
+      endpoint: { method: 'POST', path: '/api/ContentSafety/analyze-text' },
+      what: 'Azure AI Content Safety provides real-time moderation for user-generated content. It returns per-category severity scores (0–6) for Hate, Violence, Sexual, and SelfHarm — enabling threshold-based allow/block decisions.',
+      codebase: 'AIShowcase.Api uses ContentSafetyClient. The ContentSafetyService calls AnalyzeTextAsync and maps category results to a clean response with severity labels and an overall pass/flag decision.',
+      code: `<span class="code-keyword">var</span> client  = <span class="code-keyword">new</span> <span class="code-type">ContentSafetyClient</span>(endpoint, credential);
+<span class="code-keyword">var</span> request = <span class="code-keyword">new</span> <span class="code-type">AnalyzeTextOptions</span>(text);
+<span class="code-keyword">var</span> response = <span class="code-keyword">await</span> client.<span class="code-method">AnalyzeTextAsync</span>(request);
+<span class="code-comment">// Check per-category severity scores (0–6)</span>`,
+      demoDesc: 'Analyze text for safety concerns. Returns severity scores across four moderation categories.',
+      demoInput: `<div class="input-group">
+        <div class="input-label">Text to Analyze</div>
+        <textarea class="demo-input" id="safetyText" rows="3">I love working with Azure AI services. They make building intelligent applications so much easier!</textarea>
+      </div>`,
+      runFn: 'runContentSafetyDemo'
+    }
+  };
 
-      <a href="platform-safety.html" class="part-card">
-        <div class="part-number">Part 3</div>
-        <div class="part-title">Platform &amp; Safety</div>
-        <div class="part-desc">The production guardrail layer — real-time content moderation with per-category severity scoring. The primitive every enterprise AI deployment requires before going to users.</div>
-        <div class="part-chips">
-          <span class="chip">Content Safety</span>
-          <span class="chip">Moderation</span>
-          <span class="chip">Severity Scoring</span>
-        </div>
-      </a>
+  // Track current service key
+  let currentServiceKey = 'openai';
 
-    </div>
-  </section>
+  // ─── NAVIGATION ──────────────────────────────────────
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('visible');
+  }
 
-  <!-- Backend API + Swagger — combined two-column -->
-  <section class="fade-up delay-3">
-    <div class="section-label">Backend API — Not a Black Box</div>
-    <div class="api-section">
-<!--       <div class="api-header">
-        <div class="api-header-left">
-          <h3>AIShowcase.Api · .NET 8 Web API</h3>
-          <p>One service class per primitive · Singleton DI · Swagger/OpenAPI · CORS DevPolicy</p>
-        </div>
-        <span class="api-endpoint">https://localhost:7132</span>
-      </div> -->
-      <!-- Two-column: routes left, swagger right -->
-      <div class="api-two-col">
-        <div class="api-routes-col">
-          <div class="api-routes">
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Document/analyze</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Language/analyze</span></div>
-            <div class="api-route"><span class="method-badge method-get">GET</span><span class="route-path">/api/Search/query</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Search/index</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Chat/message</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Speech/synthesize</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Vision/analyze</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-text</span></div>
-            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-image</span></div>
-          </div>
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('visible');
+  }
 
-  <!-- Stack -->
-<!--   <section class="fade-up delay-4">
-    <div class="section-label">Technical Stack</div>
-    <div class="stack-row">
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c1)"></div>
-        <div>
-          <div class="stack-item-name">.NET 8 / C#</div>
-          <div class="stack-item-sub">Web API · Minimal Hosting</div>
-        </div>
+  function loadService(key, navEl, mobileNavEl) {
+    const s = services[key];
+    if (!s) return;
+
+    currentServiceKey = key;
+
+    if (window.innerWidth <= 768) closeSidebar();
+
+    // Desktop nav active state
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+
+    // Mobile nav active state
+    document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+    if (mobileNavEl) mobileNavEl.classList.add('active');
+
+    // Breadcrumb
+    document.getElementById('bcCat').textContent = s.category;
+    document.getElementById('bcCurrent').textContent = s.breadcrumb;
+
+    // Tags
+    document.getElementById('conceptTags').innerHTML = s.tags
+      .map(t => `<span class="tag${t.green ? ' green' : ''}">${t.label}</span>`)
+      .join('');
+
+    // Header
+    document.getElementById('conceptTitle').innerHTML = `${s.titleMain} <span>${s.titleAccent}</span>`;
+    document.getElementById('conceptTagline').textContent = s.tagline;
+
+    // Endpoint badge
+    document.getElementById('endpointBadge').innerHTML =
+      `<span class="method-badge">${s.endpoint.method}</span>${s.endpoint.path}`;
+
+    // Explanation panel
+    document.getElementById('explanationBody').innerHTML = `
+      <div class="explanation-section">
+        <div class="section-label">What it is</div>
+        <div class="explanation-text">${s.what}</div>
       </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c4)"></div>
-        <div>
-          <div class="stack-item-name">Azure PaaS</div>
-          <div class="stack-item-sub">East US · rg-ai-showcase</div>
-        </div>
+      <div class="explanation-section">
+        <div class="section-label">In this codebase</div>
+        <div class="explanation-text">${s.codebase}</div>
       </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c2)"></div>
-        <div>
-          <div class="stack-item-name">Azure SDK for .NET</div>
-          <div class="stack-item-sub">Azure.AI.* NuGet packages</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c3)"></div>
-        <div>
-          <div class="stack-item-name">Swashbuckle</div>
-          <div class="stack-item-sub">Swagger / OpenAPI 3.0</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c6)"></div>
-        <div>
-          <div class="stack-item-name">Vanilla HTML/CSS/JS</div>
-          <div class="stack-item-sub">No framework · No build step</div>
-        </div>
-      </div>
-    </div>
+      <div class="explanation-section">
+        <div class="section-label">Code example</div>
+        <div class="code-snippet">${s.code}</div>
+      </div>`;
 
-  </section> -->
+    // Demo panel
+    document.getElementById('demoDescription').textContent = s.demoDesc;
+    document.getElementById('demoInputGroup').outerHTML = `<div id="demoInputGroup">${s.demoInput}</div>`;
 
+    // Reset response + audio
+    document.getElementById('responseBody').innerHTML =
+      '<span class="response-placeholder">Tap "Run Demo" to fire the API call...</span>';
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'status-badge empty';
+    badge.textContent = 'Awaiting request';
 
+    const audioPlayer = document.getElementById('audioPlayer');
+    if (audioPlayer) { audioPlayer.style.display = 'none'; }
 
-        </div>
-        <div class="api-swagger-col">
-          <div class="swagger-img-wrap" onclick="document.getElementById('swaggerModal').classList.add('open')" title="Click to expand">
-            <img
-              src="swagger-screenshot2.png"
-              alt="AIShowcase.Api Swagger UI"
-              onerror="this.parentElement.style.display='none';"
-            />
-          </div>
-        </div>
-        <!-- Swagger Modal -->
-        <div class="swagger-modal" id="swaggerModal" onclick="this.classList.remove('open')">
-          <img src="swagger-screenshot2.png" alt="AIShowcase.Api Swagger UI — full view" />
-        </div>
-      </div>
-    </div>
-  </section>
+    // Animate
+    ['concept-header', 'explanationPanel', 'demoPanel'].forEach(id => {
+      const el = document.getElementById(id) || document.querySelector('.' + id);
+      if (el) { el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
+    });
 
-  <!-- Stack -->
-  <section class="fade-up delay-4">
-    <div class="section-label">Technical Stack</div>
-    <div class="stack-row">
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c1)"></div>
-        <div>
-          <div class="stack-item-name">.NET 8 / C#</div>
-          <div class="stack-item-sub">Web API · Minimal Hosting</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c4)"></div>
-        <div>
-          <div class="stack-item-name">Azure PaaS</div>
-          <div class="stack-item-sub">East US · rg-ai-showcase</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c2)"></div>
-        <div>
-          <div class="stack-item-name">Azure SDK for .NET</div>
-          <div class="stack-item-sub">Azure.AI.* NuGet packages</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c3)"></div>
-        <div>
-          <div class="stack-item-name">Swashbuckle</div>
-          <div class="stack-item-sub">Swagger / OpenAPI 3.0</div>
-        </div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-dot" style="background:var(--c6)"></div>
-        <div>
-          <div class="stack-item-name">Vanilla HTML/CSS/JS</div>
-          <div class="stack-item-sub">No framework · No build step</div>
-        </div>
-      </div>
-    </div>
+    document.getElementById('contentArea').scrollTop = 0;
+  }
 
-  </section>
+  // ─── DEMO RUNNER DISPATCHER ──────────────────────────
+  function runCurrentDemo() {
+    const s = services[currentServiceKey];
+    if (s && window[s.runFn]) window[s.runFn]();
+  }
 
-  <!-- Chapter 2 Teaser -->
-<!--   <section class="fade-up delay-5">
-    <div class="section-label">What Comes Next</div>
-    <div class="chapter2">
-      <div style="flex:1; min-width:260px;">
-        <div class="chapter2-label">Chapter 2 — Coming</div>
-        <h3>Event-Driven AI in .NET</h3>
-        <p>Azure Functions · Storage Queues · Blob Storage · Async AI pipelines at scale. Where Chapter 1 demonstrates <em>what</em> the services do, Chapter 2 demonstrates <em>how they run</em> in production event-driven architectures.</p>
-        <div class="chapter2-tags">
-          <span class="coming-tag">Azure Functions</span>
-          <span class="coming-tag">Storage Queues</span>
-          <span class="coming-tag">Blob Storage</span>
-          <span class="coming-tag">Event Grid</span>
-          <span class="coming-tag">Async Pipelines</span>
-        </div>
-      </div>
-      <div style="flex:1; min-width:260px;">
-        <div class="chapter2-label">Chapter 1 — Complete</div>
-        <h3>Azure AI PaaS Consumption</h3>
-        <p>Seven services provisioned, wired, and tested. A clean, repeatable service-per-primitive pattern that any .NET team can adopt. The foundation for everything that follows.</p>
-        <div class="chapter2-tags">
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Document Intelligence</span>
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Language</span>
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Search</span>
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ OpenAI</span>
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Vision</span>
-          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Content Safety</span>
-        </div>
-      </div>
-    </div>
-  </section> -->
+  function setLoading() {
+    const badge = document.getElementById('statusBadge');
+    const body = document.getElementById('responseBody');
+    badge.className = 'status-badge waiting';
+    badge.textContent = 'Calling API...';
+    body.innerHTML = '<span class="pulse">Awaiting response...</span>';
+    document.getElementById('runBtn').disabled = true;
+    const audioPlayer = document.getElementById('audioPlayer');
+    if (audioPlayer) audioPlayer.style.display = 'none';
+  }
 
-  <!-- Footer -->
-  <footer>
-    <span>Michael Bruno · Senior .NET / Azure Architect</span>
-    <span>Azure AI Showcase · Chapter 1 · 2026</span>
-  </footer>
+  function setSuccess(text) {
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'status-badge ready';
+    badge.textContent = '200 OK';
+    document.getElementById('responseBody').textContent = text;
+    document.getElementById('runBtn').disabled = false;
+  }
+
+  function setError(msg) {
+    const badge = document.getElementById('statusBadge');
+    badge.className = 'status-badge error';
+    badge.textContent = 'Error';
+    document.getElementById('responseBody').textContent = msg;
+    document.getElementById('runBtn').disabled = false;
+  }
+
+  // ─── DEMO IMPLEMENTATIONS ────────────────────────────
+
+  async function runDocIntelligenceDemo() {
+    setLoading();
+    const url = document.getElementById('docUrl')?.value?.trim();
+    if (!url) { setError('Please enter a PDF URL.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Document/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runLanguageDemo() {
+    setLoading();
+    const text = document.getElementById('langText')?.value?.trim();
+    if (!text) { setError('Please enter some text.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Language/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runSearchDemo() {
+    setLoading();
+    const query = document.getElementById('searchQuery')?.value?.trim();
+    if (!query) { setError('Please enter a search query.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Search/query?q=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runOpenAIDemo() {
+    setLoading();
+    const message = document.getElementById('chatMessage')?.value?.trim();
+    if (!message) { setError('Please enter a message.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Chat/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runSpeechDemo() {
+    setLoading();
+    const text = document.getElementById('speechText')?.value?.trim();
+    if (!text) { setError('Please enter text to speak.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Speech/synthesize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge ready';
+      badge.textContent = '200 OK';
+      document.getElementById('responseBody').textContent =
+        JSON.stringify({ voiceName: data.voiceName, characterCount: data.characterCount, audioFormat: data.audioFormat }, null, 2);
+      document.getElementById('runBtn').disabled = false;
+
+      // Play audio
+      if (data.audioBase64) {
+        const audioEl = document.getElementById('audioEl');
+        audioEl.src = `data:audio/wav;base64,${data.audioBase64}`;
+        document.getElementById('audioPlayer').style.display = 'block';
+        audioEl.play();
+      }
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runVisionDemo() {
+    setLoading();
+    const imageUrl = document.getElementById('visionUrl')?.value?.trim();
+    if (!imageUrl) { setError('Please enter an image URL.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/Vision/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+
+  async function runContentSafetyDemo() {
+    setLoading();
+    const text = document.getElementById('safetyText')?.value?.trim();
+    if (!text) { setError('Please enter text to analyze.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/ContentSafety/analyze-text`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuccess(JSON.stringify(data, null, 2));
+    } catch (e) { setError(`Could not reach the API.\n${e.message}`); }
+  }
+</script>
 </body>
 </html>

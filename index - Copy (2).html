@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Enablement - Azure PaaS</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Epilogue:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #08080e;
+      --bg2:      #0d0d16;
+      --surface:  #11111c;
+      --surface2: #16162a;
+      --border:   #1c1c30;
+      --border2:  #252540;
+      --text:     #e8e8f4;
+      --muted:    #5a5a7a;
+      --muted2:   #8888aa;
+      --accent:   #7c6af7;
+      --accent2:  #a78bfa;
+      --c1:       #3b82f6;  /* doc intel — blue */
+      --c2:       #06b6d4;  /* language — cyan */
+      --c3:       #10b981;  /* search — green */
+      --c4:       #f59e0b;  /* openai — amber */
+      --c5:       #8b5cf6;  /* speech — purple */
+      --c6:       #ec4899;  /* vision — pink */
+      --c7:       #ef4444;  /* content safety — red */
+      --clean:    #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Epilogue', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 5rem 2rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1px;
+      background: var(--accent);
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--c1) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--muted2);
+      /* max-width: 640px; */
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .meta-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+      letter-spacing: 0.05em;
+    }
+    .meta-pill.accent {
+      border-color: rgba(124,106,247,0.4);
+      color: var(--accent2);
+      background: rgba(124,106,247,0.08);
+    }
+
+    /* ── Section ── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    /* ── Part Cards ── */
+    .part-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .part-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .part-card::after {
+      content: '→';
+      position: absolute;
+      bottom: 1.5rem; right: 1.5rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .part-card:hover {
+      background: var(--surface2);
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+    .part-card:hover::after {
+      color: var(--accent2);
+      right: 1.25rem;
+    }
+    .part-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .part-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .part-desc {
+      font-size: 0.83rem;
+      color: var(--muted2);
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+    .part-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+    }
+
+    /* ── Backend API Section ── */
+    .api-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .api-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .api-header-left h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .api-header-left p {
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+    .api-endpoint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      background: rgba(124,106,247,0.08);
+      border: 1px solid rgba(124,106,247,0.2);
+      padding: 0.35rem 0.85rem;
+      border-radius: 5px;
+    }
+    .api-routes {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+    .api-route {
+      background: var(--bg2);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .method-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      min-width: 42px;
+      text-align: center;
+    }
+    .method-post { background: rgba(34,197,94,0.15); color: var(--clean); border: 1px solid rgba(34,197,94,0.25); }
+    .method-get  { background: rgba(59,130,246,0.15); color: var(--c1);    border: 1px solid rgba(59,130,246,0.25); }
+    .route-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted2);
+    }
+
+    /* ── Stack Section ── */
+    .stack-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .stack-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .stack-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .stack-item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .stack-item-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Chapter 2 Teaser ── */
+    .chapter2 {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .chapter2-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .chapter2 h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .chapter2 p {
+      font-size: 0.85rem;
+      color: var(--muted2);
+      line-height: 1.7;
+    }
+    .chapter2-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .coming-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      border: 1px dashed var(--border2);
+      color: var(--muted);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    footer span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+      section { padding: 2rem 1rem; }
+      .hero { padding: 3rem 1rem 0rem; }
+    
+
+    /* ── API Two-Column ── */
+    .api-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+    .api-routes-col {
+      background: var(--bg2);
+    }
+    .api-routes-col .api-routes {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+    }
+    .api-swagger-col {
+      background: var(--bg2);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .swagger-img-wrap {
+      overflow: hidden;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      cursor: zoom-in;
+      flex: 1;
+    }
+    .swagger-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 0% 8%;
+      display: block;
+      transition: opacity 0.15s;
+    }
+    .swagger-img-wrap:hover img { opacity: 0.85; }
+    /* Modal */
+    .swagger-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+    .swagger-modal.open { display: flex; }
+    .swagger-modal img {
+      max-width: 760px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    @media (max-width: 640px) {
+      .api-two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Michael Bruno · .NET 8 Web API · Azure East US</div>
+    <!-- <h1><em>Enterprise AI</em><br/>in Azure</h1> -->
+      <h1><em>Enterprise AI</em> in Azure</h1>
+    <p class="hero-desc">
+      Hands-on demonstration of consuming Azure AI PaaS services in a production-pattern
+      .NET 8 Web API.
+    </p>
+<!--     <div class="hero-meta">
+      <span class="meta-pill accent">7 Azure AI Services</span>
+      <span class="meta-pill accent">12 Primitives</span>
+      <span class="meta-pill">.NET 8 · C#</span> -->
+      <!-- <span class="meta-pill">Azure East US</span>
+      <span class="meta-pill">rg-ai-showcase</span> -->
+    <!-- </div> -->
+  </div>
+  <!-- Parts Nav -->
+  <section class="fade-up delay-2">
+    <div class="section-label">Select a Capability Group to Explore</div>
+    <div class="part-grid">
+
+      <a href="document-pipeline.html" class="part-card">
+        <div class="part-number">Part 1</div>
+        <div class="part-title">Document Pipeline</div>
+        <div class="part-desc">Upload a PDF and fan out across three primitives automatically — extraction, language understanding, and search indexing in a single flow.</div>
+        <div class="part-chips">
+          <span class="chip">Document Intelligence</span>
+          <span class="chip">Language</span>
+          <span class="chip">AI Search</span>
+        </div>
+      </a>
+
+      <a href="interactive-media.html" class="part-card">
+        <div class="part-number">Part 2</div>
+        <div class="part-title">Interactive Media</div>
+        <div class="part-desc">Generative and perceptual AI — chat completions, speech synthesis, and image analysis demonstrating Azure's multimodal surface area.</div>
+        <div class="part-chips">
+          <span class="chip">Azure OpenAI</span>
+          <span class="chip">Speech</span>
+          <span class="chip">Vision</span>
+        </div>
+      </a>
+
+      <a href="platform-safety.html" class="part-card">
+        <div class="part-number">Part 3</div>
+        <div class="part-title">Platform &amp; Safety</div>
+        <div class="part-desc">The production guardrail layer — real-time content moderation with per-category severity scoring. The primitive every enterprise AI deployment requires before going to users.</div>
+        <div class="part-chips">
+          <span class="chip">Content Safety</span>
+          <span class="chip">Moderation</span>
+          <span class="chip">Severity Scoring</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Backend API + Swagger — combined two-column -->
+  <section class="fade-up delay-3">
+    <div class="section-label">Backend API — Not a Black Box</div>
+    <div class="api-section">
+<!--       <div class="api-header">
+        <div class="api-header-left">
+          <h3>AIShowcase.Api · .NET 8 Web API</h3>
+          <p>One service class per primitive · Singleton DI · Swagger/OpenAPI · CORS DevPolicy</p>
+        </div>
+        <span class="api-endpoint">https://localhost:7132</span>
+      </div> -->
+      <!-- Two-column: routes left, swagger right -->
+      <div class="api-two-col">
+        <div class="api-routes-col">
+          <div class="api-routes">
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Document/analyze</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Language/analyze</span></div>
+            <div class="api-route"><span class="method-badge method-get">GET</span><span class="route-path">/api/Search/query</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Search/index</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Chat/message</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Speech/synthesize</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/Vision/analyze</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-text</span></div>
+            <div class="api-route"><span class="method-badge method-post">POST</span><span class="route-path">/api/ContentSafety/analyze-image</span></div>
+          </div>
+
+  <!-- Stack -->
+<!--   <section class="fade-up delay-4">
+    <div class="section-label">Technical Stack</div>
+    <div class="stack-row">
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c1)"></div>
+        <div>
+          <div class="stack-item-name">.NET 8 / C#</div>
+          <div class="stack-item-sub">Web API · Minimal Hosting</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c4)"></div>
+        <div>
+          <div class="stack-item-name">Azure PaaS</div>
+          <div class="stack-item-sub">East US · rg-ai-showcase</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c2)"></div>
+        <div>
+          <div class="stack-item-name">Azure SDK for .NET</div>
+          <div class="stack-item-sub">Azure.AI.* NuGet packages</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c3)"></div>
+        <div>
+          <div class="stack-item-name">Swashbuckle</div>
+          <div class="stack-item-sub">Swagger / OpenAPI 3.0</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c6)"></div>
+        <div>
+          <div class="stack-item-name">Vanilla HTML/CSS/JS</div>
+          <div class="stack-item-sub">No framework · No build step</div>
+        </div>
+      </div>
+    </div>
+
+  </section> -->
+
+
+
+        </div>
+        <div class="api-swagger-col">
+          <div class="swagger-img-wrap" onclick="document.getElementById('swaggerModal').classList.add('open')" title="Click to expand">
+            <img
+              src="swagger-screenshot2.png"
+              alt="AIShowcase.Api Swagger UI"
+              onerror="this.parentElement.style.display='none';"
+            />
+          </div>
+        </div>
+        <!-- Swagger Modal -->
+        <div class="swagger-modal" id="swaggerModal" onclick="this.classList.remove('open')">
+          <img src="swagger-screenshot2.png" alt="AIShowcase.Api Swagger UI — full view" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stack -->
+  <section class="fade-up delay-4">
+    <div class="section-label">Technical Stack</div>
+    <div class="stack-row">
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c1)"></div>
+        <div>
+          <div class="stack-item-name">.NET 8 / C#</div>
+          <div class="stack-item-sub">Web API · Minimal Hosting</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c4)"></div>
+        <div>
+          <div class="stack-item-name">Azure PaaS</div>
+          <div class="stack-item-sub">East US · rg-ai-showcase</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c2)"></div>
+        <div>
+          <div class="stack-item-name">Azure SDK for .NET</div>
+          <div class="stack-item-sub">Azure.AI.* NuGet packages</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c3)"></div>
+        <div>
+          <div class="stack-item-name">Swashbuckle</div>
+          <div class="stack-item-sub">Swagger / OpenAPI 3.0</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--c6)"></div>
+        <div>
+          <div class="stack-item-name">Vanilla HTML/CSS/JS</div>
+          <div class="stack-item-sub">No framework · No build step</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Chapter 2 Teaser -->
+<!--   <section class="fade-up delay-5">
+    <div class="section-label">What Comes Next</div>
+    <div class="chapter2">
+      <div style="flex:1; min-width:260px;">
+        <div class="chapter2-label">Chapter 2 — Coming</div>
+        <h3>Event-Driven AI in .NET</h3>
+        <p>Azure Functions · Storage Queues · Blob Storage · Async AI pipelines at scale. Where Chapter 1 demonstrates <em>what</em> the services do, Chapter 2 demonstrates <em>how they run</em> in production event-driven architectures.</p>
+        <div class="chapter2-tags">
+          <span class="coming-tag">Azure Functions</span>
+          <span class="coming-tag">Storage Queues</span>
+          <span class="coming-tag">Blob Storage</span>
+          <span class="coming-tag">Event Grid</span>
+          <span class="coming-tag">Async Pipelines</span>
+        </div>
+      </div>
+      <div style="flex:1; min-width:260px;">
+        <div class="chapter2-label">Chapter 1 — Complete</div>
+        <h3>Azure AI PaaS Consumption</h3>
+        <p>Seven services provisioned, wired, and tested. A clean, repeatable service-per-primitive pattern that any .NET team can adopt. The foundation for everything that follows.</p>
+        <div class="chapter2-tags">
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Document Intelligence</span>
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Language</span>
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Search</span>
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ OpenAI</span>
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Vision</span>
+          <span class="coming-tag" style="border-color:rgba(34,197,94,0.3);color:var(--clean);">✓ Content Safety</span>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- Footer -->
+  <footer>
+    <span>Michael Bruno · Senior .NET / Azure Architect</span>
+    <span>Azure AI Showcase · Chapter 1 · 2026</span>
+  </footer>
+</body>
+</html>
