@@ -1,0 +1,6 @@
+# Local archive - never push to GitHub
+_archive/
+
+# OS junk
+.DS_Store
+Thumbs.db

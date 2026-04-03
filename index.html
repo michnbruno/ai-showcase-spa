@@ -467,6 +467,13 @@
     overflow-y: auto;
   }
 
+  @media (max-width: 768px) {
+    .response-body {
+      max-height: none;
+      overflow-y: visible;
+    }
+  }
+
   .response-placeholder {
     color: var(--text-muted);
     font-style: italic;
@@ -547,8 +554,11 @@
     .content-area {
       grid-template-columns: 1fr;
       padding: 20px 16px;
-      padding-bottom: calc(20px + var(--mobile-nav-height));
+      padding-bottom: calc(32px + var(--mobile-nav-height));
       gap: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      height: calc(100dvh - var(--mobile-topbar));
     }
 
     .concept-header { grid-column: 1; }
