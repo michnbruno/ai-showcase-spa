@@ -163,6 +163,9 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
 
   .hamburger {
@@ -525,8 +528,8 @@
   ═══════════════════════════════ */
 
   @media (max-width: 768px) {
-    body { overflow: hidden; }
-    .app { flex-direction: column; height: 100dvh; overflow: hidden; }
+    body { overflow-y: auto; }
+    .app { flex-direction: column; min-height: 100dvh; overflow: visible; }
     .main { overflow: visible; }
 
     .sidebar {
@@ -557,10 +560,7 @@
       padding: 20px 16px;
       padding-bottom: calc(32px + var(--mobile-nav-height));
       gap: 16px;
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
-      max-height: calc(100dvh - var(--mobile-topbar) - var(--mobile-nav-height));
-      height: calc(100dvh - var(--mobile-topbar) - var(--mobile-nav-height));
+      overflow: visible;
     }
 
     .concept-header { grid-column: 1; }
@@ -700,7 +700,7 @@
       <!-- SERVICE HEADER -->
       <div class="concept-header fade-in" id="concept-header">
         <div class="concept-title" id="conceptTitle">Azure <span>AI Showcase</span></div>
-        <div class="concept-tagline" id="conceptTagline">Enterprise AI · .NET 8 · Azure PaaSss</div>
+        <div class="concept-tagline" id="conceptTagline">Enterprise AI · .NET 8 · Azure PaaS</div>
         <div class="divider"></div>
       </div>
 
